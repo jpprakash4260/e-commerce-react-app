@@ -1,0 +1,23 @@
+# Node.js folders (not needed since app is pre-built)
+node_modules
+npm-debug.log
+yarn.lock
+package.json
+package-lock.json
+
+# Local env config
+.env
+
+# Git & editor files
+.git
+.gitignore
+.dockerignore
+.DS_Store
+.vscode
+.idea
+
+# Unused build artifacts or local output
+*.sh
+README.md
+jenkinsfile
+docker-compose.yml

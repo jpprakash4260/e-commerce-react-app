@@ -1,0 +1,27 @@
+# OS-specific files
+.DS_Store
+
+# Logs and temp files
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Editor settings
+.vscode/
+.idea/
+
+# Environment variables
+.env
+
+# Node dependencies (not required here, but good practice)
+node_modules/
+
+# Optional local output or cache
+.cache/
+dist/
+
+# Git itself
+.git/
+
+build/
