@@ -1,6 +1,12 @@
 #!/bin/bash
 
-IMAGE_NAME="/dev"
+# Stop on first error
+set -e
 
-echo "Building Docker image..."
+# Define your image name
+IMAGE_NAME="e-commerce-react-prod"
+
+echo "🔨 Building Docker image: $IMAGE_NAME"
 docker build -t $IMAGE_NAME:latest .
+
+echo "✅ Build complete."
