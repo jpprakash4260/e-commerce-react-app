@@ -2,17 +2,36 @@
 
 set -e
 
-BRANCH="${1:-dev}"  # default to dev if no argument
-IMAGE_NAME="jprakash2306/e-commerce-react-app"
-TAG="${BRANCH}-$(date +%Y%m%d%H%M%S)"
+BRANCH="$1"
 
-echo "🔨 Building Docker image for branch '$BRANCH': $IMAGE_NAME:$TAG"
-docker build -t $IMAGE_NAME:$TAG .
+if [[ -z "$BRANCH" ]]; then
+  echo "Error: Branch name argument required (dev or main)"
+  exit 1
+fi
 
-echo "✅ Build complete."
+TIMESTAMP=$(date +%Y%m%d%H%M%S)
 
-# Optionally push image to Docker Hub
-echo "📤 Pushing to Docker Hub..."
+if [[ "$BRANCH" == "dev" ]]; then
+  IMAGE_NAME="jprakash2306/e-commerce-react-dev"
+elif [[ "$BRANCH" == "main" ]]; then
+  IMAGE_NAME="jprakash2306/e-commerce-react-prod"
+else
+  echo "Error: Unsupported branch '$BRANCH'. Use dev or main."
+  exit 1
+fi
+
+TAG="${BRANCH}-${TIMESTAMP}"
+
+echo "🔨 Building Docker image $IMAGE_NAME:$TAG for branch $BRANCH"
+
+# Build the React app docker image (make sure Dockerfile builds with tag e-commerce-react-app:latest)
+docker build -t e-commerce-react-app:latest .
+
+# Tag the image with your Docker Hub repo and branch tag
+docker tag e-commerce-react-app:latest $IMAGE_NAME:$TAG
+
+# Push the image to Docker Hub
+echo "📤 Pushing image $IMAGE_NAME:$TAG to Docker Hub"
 docker push $IMAGE_NAME:$TAG
 
-echo "✅ Docker image pushed: $IMAGE_NAME:$TAG"
+echo "✅ Build and push completed for $IMAGE_NAME:$TAG"
