@@ -11,13 +11,14 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
-                    usernameVariable: 'dockerhub-username',
-                    passwordVariable: 'dockerhub-password')]) {
+                    credentialsId: 'dockerhub-credentials-id',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_PASS')]) {
 
                     script {
                         echo "Logging into DockerHub..."
                         sh """
-                            echo "$dockerhub-password" | docker login -u "$dockerhub-username" --password-stdin
+                            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
                         """
 
                         echo "Running build.sh for branch ${env.BRANCH_NAME}..."
