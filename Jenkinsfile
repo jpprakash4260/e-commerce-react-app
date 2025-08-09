@@ -1,10 +1,6 @@
 pipeline {
    agent any
 
-   environment {
-       // Remove credentials here; declare inside withCredentials instead
-   }
-
    stages {
        stage('Checkout') {
            steps {
