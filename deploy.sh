@@ -2,35 +2,39 @@
 
 set -e
 
-BRANCH="${1:-dev}"  # default to dev if no argument
-IMAGE_NAME="jprakash2306/e-commerce-react-app"
+BRANCH="$1"
 
-# Find latest image tag for that branch (simplified approach using docker image ls)
-LATEST_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "^$IMAGE_NAME:$BRANCH" | sort | tail -n1)
-
-if [ -z "$LATEST_TAG" ]; then
-  echo "❌ No image found for branch $BRANCH. Please build first."
+if [[ -z "$BRANCH" ]]; then
+  echo "Error: Branch name argument required (dev or main)"
   exit 1
 fi
 
-CONTAINER_NAME="ecommerce-${BRANCH}"
-
-# Select port based on branch
-if [ "$BRANCH" == "dev" ]; then
-  HOST_PORT=81
-elif [ "$BRANCH" == "master" ]; then
-  HOST_PORT=80
+if [[ "$BRANCH" == "dev" ]]; then
+  IMAGE_NAME="jprakash2306/e-commerce-react-dev"
+  DEPLOY_PORT=81
+  CONTAINER_NAME="reactapp-dev"
+elif [[ "$BRANCH" == "main" ]]; then
+  IMAGE_NAME="jprakash2306/e-commerce-react-prod"
+  DEPLOY_PORT=80
+  CONTAINER_NAME="reactapp-prod"
 else
-  echo "❌ Unsupported branch: $BRANCH"
+  echo "Error: Unsupported branch '$BRANCH'. Use dev or main."
   exit 1
 fi
 
-echo "📦 Stopping old container $CONTAINER_NAME (if any)..."
+# Get latest image tag for this branch (you could modify if you store tag elsewhere)
+LATEST_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "^$IMAGE_NAME:$BRANCH-" | sort | tail -n1)
+
+if [[ -z "$LATEST_TAG" ]]; then
+  echo "Error: No image found for branch $BRANCH"
+  exit 1
+fi
+
+echo "🛑 Stopping and removing old container $CONTAINER_NAME if exists..."
 docker stop $CONTAINER_NAME || true
 docker rm $CONTAINER_NAME || true
 
-echo "🚀 Deploying container $CONTAINER_NAME with image $LATEST_TAG on port $HOST_PORT..."
+echo "🚀 Deploying container $CONTAINER_NAME with image $LATEST_TAG on port $DEPLOY_PORT..."
+docker run -d -p $DEPLOY_PORT:80 --name $CONTAINER_NAME $LATEST_TAG
 
-docker run -d -p $HOST_PORT:80 --name $CONTAINER_NAME $LATEST_TAG
-
-echo "✅ Deployed successfully at http://<your-server-ip>:$HOST_PORT"
+echo "✅ Deployment of $CONTAINER_NAME completed. App accessible on port $DEPLOY_PORT."
