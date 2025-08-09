@@ -54,5 +54,26 @@ pipeline {
                 """
             }
         }
+        stage('Deploy Application') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'dev') {
+                        echo "Deploying dev branch on port 81"
+                        sh """
+                        docker stop reactapp-dev || true
+                        docker rm reactapp-dev || true
+                        docker run -d -p 81:80 --name reactapp-dev ${DOCKER_DEV_REPO}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}
+                        """
+                    } else if (env.BRANCH_NAME == 'master') {
+                        echo "Deploying master branch on port 80"
+                        sh """
+                        docker stop reactapp-prod || true
+                        docker rm reactapp-prod || true
+                        docker run -d -p 80:80 --name reactapp-prod ${DOCKER_PROD_REPO}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}
+                        """
+                    }
+                }
+            }
+        }
     }
 }
