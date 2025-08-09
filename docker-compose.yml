@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   react-static-app:
-    image: e-commerce-react-prod:latest
+    image: e-commerce-react-app:latest
     ports:
       - "80:80"
     restart: always
